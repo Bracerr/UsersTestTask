@@ -1,6 +1,7 @@
 package service
 
 import (
+	"regexp"
 	"users-api/src/internal/domain"
 	"users-api/src/internal/errors"
 )
@@ -10,6 +11,8 @@ var (
 	ErrInvalidInput = errors.ErrInvalidInput
 )
 
+var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+
 type UserService struct {
 	repo domain.UserRepository
 }
@@ -18,9 +21,16 @@ func NewUserService(repo domain.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
+func (s *UserService) validateEmail(email string) bool {
+	return emailRegex.MatchString(email)
+}
+
 func (s *UserService) CreateUser(user *domain.User) error {
 	if user.Name == "" || user.Email == "" {
 		return errors.ErrInvalidInput
+	}
+	if !s.validateEmail(user.Email) {
+		return errors.ErrInvalidEmail
 	}
 	return s.repo.Create(user)
 }
@@ -53,6 +63,9 @@ func (s *UserService) UpdateUser(user *domain.User) error {
 		currentUser.Name = user.Name
 	}
 	if user.Email != "" {
+		if !s.validateEmail(user.Email) {
+			return errors.ErrInvalidEmail
+		}
 		currentUser.Email = user.Email
 	}
 

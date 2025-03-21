@@ -31,11 +31,14 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.userService.CreateUser(&user); err != nil {
-		if err == errors.ErrInvalidInput {
+		switch err {
+		case errors.ErrInvalidInput:
 			writeError(w, http.StatusBadRequest, err, "Invalid input data")
-			return
+		case errors.ErrInvalidEmail:
+			writeError(w, http.StatusBadRequest, err, "Invalid email format")
+		default:
+			writeError(w, http.StatusInternalServerError, err, "Failed to create user")
 		}
-		writeError(w, http.StatusInternalServerError, err, "Failed to create user")
 		return
 	}
 
@@ -76,6 +79,8 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, err, "Invalid input data")
 		case errors.ErrUserNotFound:
 			writeError(w, http.StatusNotFound, err, "User not found")
+		case errors.ErrInvalidEmail:
+			writeError(w, http.StatusBadRequest, err, "Invalid email format")
 		default:
 			writeError(w, http.StatusInternalServerError, err, "Failed to update user")
 		}
