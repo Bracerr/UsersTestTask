@@ -56,9 +56,97 @@ docker-compose logs -f
 
 ## API Endpoints
 
-- `POST /users` - Создание пользователя
-- `GET /users` - Получение пользователя по ID
-- `PUT /users` - Обновление пользователя
+### Создание пользователя
+```http
+POST /users
+Content-Type: application/json
+
+{
+    "name": "Ivan",
+    "email": "ivan@example.com"
+}
+```
+
+Ответ в случае успеха (201 Created):
+```json
+{
+    "id": 1,
+    "name": "Ivan",
+    "email": "ivan@example.com",
+    "created_at": "2025-03-21T13:45:30Z",
+    "updated_at": "2025-03-21T13:45:30Z"
+}
+```
+
+### Получение пользователя
+```http
+GET /users?id=1
+```
+
+Ответ в случае успеха (200 OK):
+```json
+{
+    "id": 1,
+    "name": "Ivan",
+    "email": "ivan@example.com",
+    "created_at": "2025-03-21T13:45:30Z",
+    "updated_at": "2025-03-21T13:45:30Z"
+}
+```
+
+### Обновление пользователя
+```http
+PUT /users
+Content-Type: application/json
+
+{
+    "id": 1,
+    "name": "Ivan Updated",
+    "email": "ivan.updated@example.com"
+}
+```
+
+Ответ в случае успеха (200 OK):
+```json
+{
+    "id": 1,
+    "name": "Ivan Updated",
+    "email": "ivan.updated@example.com",
+    "created_at": "2025-03-21T13:45:30Z",
+    "updated_at": "2025-03-21T13:46:15Z"
+}
+```
+
+Можно обновлять отдельные поля:
+```json
+{
+    "id": 1,
+    "email": "new.email@example.com"
+}
+```
+
+### Возможные ошибки
+
+#### Невалидный email (400 Bad Request):
+```json
+{
+    "error": "invalid email format"
+}
+```
+
+#### Пользователь не найден (404 Not Found):
+```json
+{
+    "error": "user not found"
+}
+```
+
+#### Пустые обязательные поля (400 Bad Request):
+```json
+{
+    "error": "invalid input"
+}
+```
 
 ## Конфигурация
 
